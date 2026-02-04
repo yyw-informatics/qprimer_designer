@@ -1,5 +1,6 @@
 """Model loading and inference utilities."""
 
+import __main__
 import warnings
 from importlib.resources import files
 from pathlib import Path
@@ -7,6 +8,22 @@ from typing import Tuple
 
 import joblib
 import torch
+
+from qprimer_designer.models.architectures import CombinedModel, CombinedModelClassifier
+
+
+def _register_model_classes_for_pickle():
+    """Register model classes in __main__ for pickle compatibility.
+
+    Models saved with torch.save() when the class was defined in __main__
+    need the classes to be accessible from __main__ when loading.
+    """
+    __main__.CombinedModel = CombinedModel
+    __main__.CombinedModelClassifier = CombinedModelClassifier
+
+
+# Register classes at import time
+_register_model_classes_for_pickle()
 
 
 def get_model_path(filename: str) -> Path:
